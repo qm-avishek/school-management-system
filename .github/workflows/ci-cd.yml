@@ -35,17 +35,15 @@ jobs:
         cache: 'npm'
         cache-dependency-path: |
           backend/package-lock.json
-          frontend/package-lock.json
-
-    - name: Install Backend Dependencies
+          frontend/package-lock.json    - name: Install Backend Dependencies
       run: |
         cd backend
-        npm ci
+        npm install
 
     - name: Install Frontend Dependencies
       run: |
         cd frontend
-        npm ci
+        npm install
 
     - name: Create Environment Files
       run: |
