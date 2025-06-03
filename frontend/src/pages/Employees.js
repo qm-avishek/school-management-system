@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { employeesAPI } from '../services/api';
 
 const Employees = () => {
@@ -32,14 +32,9 @@ const Employees = () => {
     qualification: '',
     experience: '',
     emergencyContact: '',
-    status: 'active'
-  });
+    status: 'active'  });
 
-  useEffect(() => {
-    fetchEmployees();
-  }, [currentPage, searchTerm, filters]);
-
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -58,8 +53,11 @@ const Employees = () => {
       console.error('Error fetching employees:', err);
     } finally {
       setLoading(false);
-    }
-  };
+    }  }, [currentPage, searchTerm, filters]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

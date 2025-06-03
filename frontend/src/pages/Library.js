@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { libraryAPI } from '../services/api';
 
 const Library = () => {
@@ -41,19 +41,9 @@ const Library = () => {
     studentId: '',
     borrowDate: '',
     dueDate: '',
-    notes: ''
-  });
+    notes: ''  });
 
-  useEffect(() => {
-    if (activeTab === 'books') {
-      fetchBooks();
-    } else {
-      fetchBorrowRecords();
-    }
-    fetchStats();
-  }, [activeTab, currentPage, searchTerm, filters]);
-
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -71,11 +61,10 @@ const Library = () => {
       setError('Failed to fetch books');
       console.error('Error fetching books:', err);
     } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(false);    }
+  }, [currentPage, searchTerm, filters]);
 
-  const fetchBorrowRecords = async () => {
+  const fetchBorrowRecords = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -93,9 +82,8 @@ const Library = () => {
       setError('Failed to fetch borrow records');
       console.error('Error fetching borrow records:', err);
     } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(false);    }
+  }, [currentPage, searchTerm, filters]);
 
   const fetchStats = async () => {
     try {
@@ -103,8 +91,16 @@ const Library = () => {
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching stats:', err);
+    }  };
+
+  useEffect(() => {
+    if (activeTab === 'books') {
+      fetchBooks();
+    } else {
+      fetchBorrowRecords();
     }
-  };
+    fetchStats();
+  }, [activeTab, fetchBooks, fetchBorrowRecords]);
 
   const handleBookSubmit = async (e) => {
     e.preventDefault();
