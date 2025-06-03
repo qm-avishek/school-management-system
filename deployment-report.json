@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-06-03T10:41:57.806Z",
+  "version": "1.0.0",
+  "project": "SSGB College Management System",
+  "results": [
+    {
+      "name": "backend/Dockerfile",
+      "file": "backend/Dockerfile",
+      "exists": true
+    },
+    {
+      "name": "backend/railway.json",
+      "file": "backend/railway.json",
+      "exists": true
+    },
+    {
+      "name": "frontend/vercel.json",
+      "file": "frontend/vercel.json",
+      "exists": true
+    },
+    {
+      "name": ".github/workflows/ci-cd.yml",
+      "file": ".github/workflows/ci-cd.yml",
+      "exists": true
+    },
+    {
+      "name": "backend/.env.example",
+      "file": "backend/.env.example",
+      "exists": true
+    },
+    {
+      "name": "frontend/.env.example",
+      "file": "frontend/.env.example",
+      "exists": true
+    },
+    {
+      "name": "GitHub Actions",
+      "status": "configured",
+      "workflows": [
+        "ci-cd.yml",
+        "dependency-updates.yml",
+        "github-pages.yml"
+      ]
+    }
+  ],
+  "summary": {
+    "healthy": 0,
+    "unhealthy": 0,
+    "total": 7
+  }
+}

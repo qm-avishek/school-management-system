@@ -1,0 +1,35 @@
+# Configuration for welcome bot - https://github.com/apps/welcome
+
+# Configuration for new issue welcome
+# Comment to be posted to on PRs from first time contributors in your repository
+newPRWelcomeComment: >
+  🎉 Thanks for opening your first pull request in the SSGB Engineering College Management System! 
+  
+  A maintainer will review your changes and provide feedback. In the meantime, please make sure:
+  - [ ] Your PR follows our [contributing guidelines](.github/CONTRIBUTING.md)
+  - [ ] All tests pass
+  - [ ] You've updated documentation if needed
+  
+  Welcome to our community! 🎓
+
+# Configuration for new issue welcome
+# Comment to be posted to on issues opened by first time contributors in your repository
+newIssueWelcomeComment: >
+  👋 Thanks for opening your first issue in the SSGB Engineering College Management System!
+  
+  Please make sure your issue follows our templates and includes:
+  - Clear description of the problem or feature request
+  - Steps to reproduce (for bugs)
+  - Environment details
+  
+  A maintainer will review and respond soon. Welcome to our community! 🎓
+
+# Configuration for first PR merge comment
+# Comment to be posted to on pull requests merged by a first time contributor
+firstPRMergeComment: >
+  🎊 Congratulations on your first merged pull request! 
+  
+  You've successfully contributed to the SSGB Engineering College Management System. 
+  Thank you for your contribution to this educational project! 
+  
+  Feel free to take on more issues and continue contributing. 🚀
