@@ -1,0 +1,72 @@
+name: Deploy Frontend to Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Create Production Environment
+      run: |
+        cd frontend
+        echo "REACT_APP_API_URL=https://school-management-backend.railway.app/api" > .env.production
+        echo "GENERATE_SOURCEMAP=false" >> .env.production
+        echo "PUBLIC_URL=/school-management-system" >> .env.production
+
+    - name: Build Application
+      run: |
+        cd frontend
+        CI=false npm run build
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: frontend/build
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+    - name: Deployment Summary
+      run: |
+        echo "🚀 Frontend deployment completed!"
+        echo "📍 Site URL: ${{ steps.deployment.outputs.page_url }}"
+        echo ""
+        echo "✅ Next steps:"
+        echo "1. Verify the site is working correctly"
+        echo "2. Update backend API URL if needed"
+        echo "3. Test all application features"
