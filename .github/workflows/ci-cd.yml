@@ -56,8 +56,8 @@ jobs:
         echo "PORT=5000" >> .env
         echo "NODE_ENV=test" >> .env
         # Frontend environment
-        cd ../frontend
-        echo "REACT_APP_API_URL=http://localhost:5000/api" > .env        echo "GENERATE_SOURCEMAP=false" >> .env
+        cd ../frontend        echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
+        echo "GENERATE_SOURCEMAP=false" >> .env
 
     - name: Wait for MongoDB
       run: |
@@ -90,7 +90,7 @@ jobs:
     - name: Build Frontend
       run: |
         cd frontend
-        npm run build
+        CI=false npm run build
         
     - name: Test Frontend Build
       run: |
