@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { financeAPI } from '../services/api';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const Finance = () => {
   const [transactions, setTransactions] = useState([]);
@@ -30,13 +30,43 @@ const Finance = () => {
     dueDate: '',
     status: 'pending'
   });
-
   useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          ...filters
+        };
+        
+        const response = await financeAPI.getTransactions(params);
+        setTransactions(response.data.transactions);
+        setTotalPages(response.data.pagination.pages);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch transactions');
+        console.error('Error fetching transactions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchStats = async () => {
+      try {
+        const response = await financeAPI.getReports();
+        setStats(response.data);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+
     fetchTransactions();
     fetchStats();
   }, [currentPage, searchTerm, filters]);
 
-  const fetchTransactions = async () => {
+  const refreshTransactions = async () => {
     try {
       setLoading(true);
       const params = {
@@ -58,7 +88,7 @@ const Finance = () => {
     }
   };
 
-  const fetchStats = async () => {
+  const refreshStats = async () => {
     try {
       const response = await financeAPI.getReports();
       setStats(response.data);
@@ -74,12 +104,10 @@ const Finance = () => {
       } else {
         await financeAPI.createTransaction(formData);
       }
-      
-      setShowModal(false);
+        setShowModal(false);
       setSelectedTransaction(null);
-      resetForm();
-      fetchTransactions();
-      fetchStats();
+      resetForm();      refreshTransactions();
+      refreshStats();
     } catch (err) {
       setError('Failed to save transaction');
       console.error('Error saving transaction:', err);
@@ -96,11 +124,10 @@ const Finance = () => {
   };
 
   const handleDelete = async (transactionId) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
+    if (window.confirm('Are you sure you want to delete this transaction?')) {      try {
         await financeAPI.deleteTransaction(transactionId);
-        fetchTransactions();
-        fetchStats();
+        refreshTransactions();
+        refreshStats();
       } catch (err) {
         setError('Failed to delete transaction');
         console.error('Error deleting transaction:', err);
@@ -108,11 +135,10 @@ const Finance = () => {
     }
   };
 
-  const handleStatusUpdate = async (transactionId, newStatus) => {
-    try {
+  const handleStatusUpdate = async (transactionId, newStatus) => {    try {
       await financeAPI.updateTransactionStatus(transactionId, newStatus);
-      fetchTransactions();
-      fetchStats();
+      refreshTransactions();
+      refreshStats();
     } catch (err) {
       setError('Failed to update transaction status');
       console.error('Error updating status:', err);

@@ -43,8 +43,60 @@ const Library = () => {
     dueDate: '',
     notes: ''
   });
-
   useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          ...filters
+        };
+        
+        const response = await libraryAPI.getBooks(params);
+        setBooks(response.data.books);
+        setTotalPages(response.data.pagination.pages);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch books');
+        console.error('Error fetching books:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchBorrowRecords = async () => {
+      try {
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          ...filters
+        };
+        
+        const response = await libraryAPI.getBorrowRecords(params);
+        setBorrowRecords(response.data.borrowRecords);
+        setTotalPages(response.data.pagination.pages);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch borrow records');
+        console.error('Error fetching borrow records:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchStats = async () => {
+      try {
+        const response = await libraryAPI.getStats();
+        setStats(response.data);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+
     if (activeTab === 'books') {
       fetchBooks();
     } else {
@@ -52,59 +104,6 @@ const Library = () => {
     }
     fetchStats();
   }, [activeTab, currentPage, searchTerm, filters]);
-
-  const fetchBooks = async () => {
-    try {
-      setLoading(true);
-      const params = {
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-        ...filters
-      };
-      
-      const response = await libraryAPI.getBooks(params);
-      setBooks(response.data.books);
-      setTotalPages(response.data.pagination.pages);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch books');
-      console.error('Error fetching books:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchBorrowRecords = async () => {
-    try {
-      setLoading(true);
-      const params = {
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-        ...filters
-      };
-      
-      const response = await libraryAPI.getBorrowRecords(params);
-      setBorrowRecords(response.data.borrowRecords);
-      setTotalPages(response.data.pagination.pages);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch borrow records');
-      console.error('Error fetching borrow records:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await libraryAPI.getStats();
-      setStats(response.data);
-    } catch (err) {
-      console.error('Error fetching stats:', err);
-    }
-  };
 
   const handleBookSubmit = async (e) => {
     e.preventDefault();

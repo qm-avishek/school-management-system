@@ -34,12 +34,33 @@ const Employees = () => {
     emergencyContact: '',
     status: 'active'
   });
-
   useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          ...filters
+        };
+        
+        const response = await employeesAPI.getAll(params);
+        setEmployees(response.data.employees);
+        setTotalPages(response.data.pagination.pages);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch employees');
+        console.error('Error fetching employees:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchEmployees();
   }, [currentPage, searchTerm, filters]);
 
-  const fetchEmployees = async () => {
+  const refreshEmployees = async () => {
     try {
       setLoading(true);
       const params = {
@@ -68,11 +89,10 @@ const Employees = () => {
       } else {
         await employeesAPI.create(formData);
       }
-      
-      setShowModal(false);
+        setShowModal(false);
       setSelectedEmployee(null);
       resetForm();
-      fetchEmployees();
+      refreshEmployees();
     } catch (err) {
       setError('Failed to save employee');
       console.error('Error saving employee:', err);
@@ -90,10 +110,9 @@ const Employees = () => {
   };
 
   const handleDelete = async (employeeId) => {
-    if (window.confirm('Are you sure you want to delete this employee?')) {
-      try {
+    if (window.confirm('Are you sure you want to delete this employee?')) {      try {
         await employeesAPI.delete(employeeId);
-        fetchEmployees();
+        refreshEmployees();
       } catch (err) {
         setError('Failed to delete employee');
         console.error('Error deleting employee:', err);

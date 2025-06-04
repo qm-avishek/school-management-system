@@ -32,12 +32,33 @@ const Students = () => {
     guardianPhone: '',
     status: 'active'
   });
-
   useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          limit: 10,
+          search: searchTerm,
+          ...filters
+        };
+        
+        const response = await studentsAPI.getAll(params);
+        setStudents(response.data.students);
+        setTotalPages(response.data.pagination.pages);
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch students');
+        console.error('Error fetching students:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchStudents();
   }, [currentPage, searchTerm, filters]);
 
-  const fetchStudents = async () => {
+  const refreshStudents = async () => {
     try {
       setLoading(true);
       const params = {
@@ -66,11 +87,10 @@ const Students = () => {
       } else {
         await studentsAPI.create(formData);
       }
-      
-      setShowModal(false);
+        setShowModal(false);
       setSelectedStudent(null);
       resetForm();
-      fetchStudents();
+      refreshStudents();
     } catch (err) {
       setError('Failed to save student');
       console.error('Error saving student:', err);
@@ -88,10 +108,9 @@ const Students = () => {
   };
 
   const handleDelete = async (studentId) => {
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      try {
+    if (window.confirm('Are you sure you want to delete this student?')) {      try {
         await studentsAPI.delete(studentId);
-        fetchStudents();
+        refreshStudents();
       } catch (err) {
         setError('Failed to delete student');
         console.error('Error deleting student:', err);
