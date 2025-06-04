@@ -55,7 +55,7 @@ jobs:
         echo "JWT_SECRET=test_jwt_secret_key_for_ci_testing_only" >> .env
         echo "PORT=5000" >> .env
         echo "NODE_ENV=test" >> .env
-        # Frontend environment
+          # Frontend environment
         cd ../frontend
         echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
         echo "GENERATE_SOURCEMAP=false" >> .env
@@ -101,7 +101,6 @@ jobs:
       run: |
         cd frontend
         CI=true npm test -- --coverage --watchAll=false || echo "Frontend tests not implemented yet"
-
   security-scan:
     runs-on: ubuntu-latest
     needs: test
@@ -181,6 +180,30 @@ jobs:
           !backend/.env
         retention-days: 30
 
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: build-artifacts
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/build/
+
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        vercel-args: '--prod'
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./frontend
   deploy-backend:
     runs-on: ubuntu-latest
     needs: build-artifacts
@@ -190,25 +213,22 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Download Backend Artifacts
+      uses: actions/download-artifact@v4
       with:
-        node-version: ${{ env.NODE_VERSION }}
-
-    - name: Install Railway CLI
-      run: npm install -g @railway/cli
+        name: backend-build
+        path: ./
 
     - name: Deploy to Railway
-      run: |
-        cd backend
-        railway login --token ${{ secrets.RAILWAY_TOKEN }}
-        railway deploy --service ${{ secrets.RAILWAY_SERVICE_ID }}
+      uses: bervProject/railway-deploy@main
+      with:
+        service: ${{ secrets.RAILWAY_SERVICE_ID }}
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   deploy-status:
     runs-on: ubuntu-latest
-    needs: [deploy-backend]
+    needs: [deploy-frontend, deploy-backend]
     if: always()
     
     steps:
@@ -216,11 +236,10 @@ jobs:
       run: |
         echo "🚀 Deployment Summary"
         echo "==================="
+        echo "Frontend: ${{ needs.deploy-frontend.result }}"
         echo "Backend: ${{ needs.deploy-backend.result }}"
-        if [ "${{ needs.deploy-backend.result }}" == "success" ]; then
-          echo "✅ Railway deployment successful!"
-          echo "🌐 URL: https://school-management-system-production-685b.up.railway.app"
+        if [ "${{ needs.deploy-frontend.result }}" == "success" ] && [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+          echo "✅ Full deployment successful!"
         else
-          echo "❌ Railway deployment failed"
-          echo "Please check the logs and Railway secrets configuration"
+          echo "❌ Deployment issues detected"
         fi
