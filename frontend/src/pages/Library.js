@@ -42,71 +42,8 @@ const Library = () => {
     borrowDate: '',
     dueDate: '',
     notes: ''
-  });
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        setLoading(true);
-        const params = {
-          page: currentPage,
-          limit: 10,
-          search: searchTerm,
-          ...filters
-        };
-        
-        const response = await libraryAPI.getBooks(params);
-        setBooks(response.data.books);
-        setTotalPages(response.data.pagination.pages);
-        setError(null);
-      } catch (err) {
-        setError('Failed to fetch books');
-        console.error('Error fetching books:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchBorrowRecords = async () => {
-      try {
-        setLoading(true);
-        const params = {
-          page: currentPage,
-          limit: 10,
-          search: searchTerm,
-          ...filters
-        };
-        
-        const response = await libraryAPI.getBorrowRecords(params);
-        setBorrowRecords(response.data.borrowRecords);
-        setTotalPages(response.data.pagination.pages);
-        setError(null);
-      } catch (err) {
-        setError('Failed to fetch borrow records');
-        console.error('Error fetching borrow records:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchStats = async () => {
-      try {
-        const response = await libraryAPI.getStats();
-        setStats(response.data);
-      } catch (err) {
-        console.error('Error fetching stats:', err);
-      }
-    };
-
-    if (activeTab === 'books') {
-      fetchBooks();
-    } else {
-      fetchBorrowRecords();
-    }
-    fetchStats();
-  }, [activeTab, currentPage, searchTerm, filters]);
-
-  // Separate refresh functions for manual refreshes
-  const refreshBooks = async () => {
+  });  // Define fetch functions outside useEffect
+  const fetchBooksData = async () => {
     try {
       setLoading(true);
       const params = {
@@ -128,7 +65,7 @@ const Library = () => {
     }
   };
 
-  const refreshBorrowRecords = async () => {
+  const fetchBorrowRecordsData = async () => {
     try {
       setLoading(true);
       const params = {
@@ -150,13 +87,34 @@ const Library = () => {
     }
   };
 
-  const refreshStats = async () => {
+  const fetchStatsData = async () => {
     try {
       const response = await libraryAPI.getStats();
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching stats:', err);
     }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'books') {
+      fetchBooksData();
+    } else {
+      fetchBorrowRecordsData();
+    }
+    fetchStatsData();
+  }, [activeTab, currentPage, searchTerm, filters]);
+  // Separate refresh functions for manual refreshes
+  const refreshBooks = async () => {
+    await fetchBooksData();
+  };
+
+  const refreshBorrowRecords = async () => {
+    await fetchBorrowRecordsData();
+  };
+
+  const refreshStats = async () => {
+    await fetchStatsData();
   };
 
   const handleBookSubmit = async (e) => {
@@ -608,8 +566,7 @@ const Library = () => {
                         Returned: {new Date(record.returnDate).toLocaleDateString()}
                       </div>
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  </td>                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       (() => {
                         if (record.returnDate) return 'bg-green-100 text-green-800';
@@ -617,8 +574,11 @@ const Library = () => {
                         return 'bg-yellow-100 text-yellow-800';
                       })()
                     }`}>
-                      {record.returnDate ? 'Returned' : 
-                       new Date(record.dueDate) < new Date() ? 'Overdue' : 'Active'}
+                      {(() => {
+                        if (record.returnDate) return 'Returned';
+                        if (new Date(record.dueDate) < new Date()) return 'Overdue';
+                        return 'Active';
+                      })()}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -677,12 +637,14 @@ const Library = () => {
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {modalType === 'book' 
-                  ? (selectedItem ? 'Edit Book' : 'Add New Book')
-                  : (selectedItem ? 'Edit Borrow Record' : 'Issue Book')
-                }
+            <div className="mt-3">              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {(() => {
+                  if (modalType === 'book') {
+                    return selectedItem ? 'Edit Book' : 'Add New Book';
+                  } else {
+                    return selectedItem ? 'Edit Borrow Record' : 'Issue Book';
+                  }
+                })()}
               </h3>
               
               {modalType === 'book' ? (
