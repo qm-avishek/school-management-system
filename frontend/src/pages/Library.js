@@ -105,6 +105,60 @@ const Library = () => {
     fetchStats();
   }, [activeTab, currentPage, searchTerm, filters]);
 
+  // Separate refresh functions for manual refreshes
+  const refreshBooks = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+        ...filters
+      };
+      
+      const response = await libraryAPI.getBooks(params);
+      setBooks(response.data.books);
+      setTotalPages(response.data.pagination.pages);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch books');
+      console.error('Error fetching books:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshBorrowRecords = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: 10,
+        search: searchTerm,
+        ...filters
+      };
+      
+      const response = await libraryAPI.getBorrowRecords(params);
+      setBorrowRecords(response.data.borrowRecords);
+      setTotalPages(response.data.pagination.pages);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch borrow records');
+      console.error('Error fetching borrow records:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshStats = async () => {
+    try {
+      const response = await libraryAPI.getStats();
+      setStats(response.data);
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  };
+
   const handleBookSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -112,12 +166,11 @@ const Library = () => {
       } else {
         await libraryAPI.createBook(bookFormData);
       }
-      
-      setShowModal(false);
+        setShowModal(false);
       setSelectedItem(null);
       resetBookForm();
-      fetchBooks();
-      fetchStats();
+      refreshBooks();
+      refreshStats();
     } catch (err) {
       setError('Failed to save book');
       console.error('Error saving book:', err);
@@ -131,13 +184,12 @@ const Library = () => {
       } else {
         await libraryAPI.issueBook(borrowFormData);
       }
-      
-      setShowModal(false);
+        setShowModal(false);
       setSelectedItem(null);
       resetBorrowForm();
-      fetchBorrowRecords();
-      fetchBooks();
-      fetchStats();
+      refreshBorrowRecords();
+      refreshBooks();
+      refreshStats();
     } catch (err) {
       setError('Failed to save borrow record');
       console.error('Error saving borrow record:', err);
@@ -168,15 +220,15 @@ const Library = () => {
       'Are you sure you want to delete this book?' : 
       'Are you sure you want to delete this borrow record?';
       
-    if (window.confirm(confirmMessage)) {
-      try {
-        if (type === 'book') {          await libraryAPI.deleteBook(itemId);
-          fetchBooks();
+    if (window.confirm(confirmMessage)) {      try {
+        if (type === 'book') {
+          await libraryAPI.deleteBook(itemId);
+          refreshBooks();
         } else {
           await libraryAPI.deleteBorrowRecord(itemId);
-          fetchBorrowRecords();
+          refreshBorrowRecords();
         }
-        fetchStats();
+        refreshStats();
       } catch (err) {
         setError(`Failed to delete ${type}`);
         console.error(`Error deleting ${type}:`, err);
@@ -184,12 +236,11 @@ const Library = () => {
     }
   };
 
-  const handleReturn = async (recordId) => {
-    try {
+  const handleReturn = async (recordId) => {    try {
       await libraryAPI.returnBook(recordId, {});
-      fetchBorrowRecords();
-      fetchBooks();
-      fetchStats();
+      refreshBorrowRecords();
+      refreshBooks();
+      refreshStats();
     } catch (err) {
       setError('Failed to return book');
       console.error('Error returning book:', err);
