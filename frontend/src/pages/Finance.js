@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { financeAPI } from '../services/api';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
 const Finance = () => {
   const [transactions, setTransactions] = useState([]);
@@ -28,9 +28,15 @@ const Finance = () => {
     studentId: '',
     employeeId: '',
     dueDate: '',
-    status: 'pending'  });
+    status: 'pending'
+  });
 
-  const fetchTransactions = useCallback(async () => {
+  useEffect(() => {
+    fetchTransactions();
+    fetchStats();
+  }, [currentPage, searchTerm, filters]);
+
+  const fetchTransactions = async () => {
     try {
       setLoading(true);
       const params = {
@@ -49,12 +55,8 @@ const Finance = () => {
       console.error('Error fetching transactions:', err);
     } finally {
       setLoading(false);
-    }  }, [currentPage, searchTerm, filters]);
-
-  useEffect(() => {
-    fetchTransactions();
-    fetchStats();
-  }, [fetchTransactions]);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -141,6 +143,7 @@ const Finance = () => {
   const incomeCategories = ['tuition-fee', 'admission-fee', 'exam-fee', 'library-fee', 'hostel-fee', 'transport-fee', 'other'];
   const expenseCategories = ['salary', 'infrastructure', 'utilities', 'supplies', 'maintenance', 'equipment', 'marketing', 'other'];
   const statuses = ['pending', 'paid', 'overdue', 'cancelled'];
+
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   const chartData = stats.monthlyData || [];

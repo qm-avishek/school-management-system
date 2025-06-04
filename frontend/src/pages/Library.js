@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { libraryAPI } from '../services/api';
 
 const Library = () => {
@@ -41,9 +41,19 @@ const Library = () => {
     studentId: '',
     borrowDate: '',
     dueDate: '',
-    notes: ''  });
+    notes: ''
+  });
 
-  const fetchBooks = useCallback(async () => {
+  useEffect(() => {
+    if (activeTab === 'books') {
+      fetchBooks();
+    } else {
+      fetchBorrowRecords();
+    }
+    fetchStats();
+  }, [activeTab, currentPage, searchTerm, filters]);
+
+  const fetchBooks = async () => {
     try {
       setLoading(true);
       const params = {
@@ -61,10 +71,11 @@ const Library = () => {
       setError('Failed to fetch books');
       console.error('Error fetching books:', err);
     } finally {
-      setLoading(false);    }
-  }, [currentPage, searchTerm, filters]);
+      setLoading(false);
+    }
+  };
 
-  const fetchBorrowRecords = useCallback(async () => {
+  const fetchBorrowRecords = async () => {
     try {
       setLoading(true);
       const params = {
@@ -82,8 +93,9 @@ const Library = () => {
       setError('Failed to fetch borrow records');
       console.error('Error fetching borrow records:', err);
     } finally {
-      setLoading(false);    }
-  }, [currentPage, searchTerm, filters]);
+      setLoading(false);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -91,16 +103,8 @@ const Library = () => {
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching stats:', err);
-    }  };
-
-  useEffect(() => {
-    if (activeTab === 'books') {
-      fetchBooks();
-    } else {
-      fetchBorrowRecords();
     }
-    fetchStats();
-  }, [activeTab, fetchBooks, fetchBorrowRecords]);
+  };
 
   const handleBookSubmit = async (e) => {
     e.preventDefault();
@@ -170,7 +174,7 @@ const Library = () => {
         if (type === 'book') {          await libraryAPI.deleteBook(itemId);
           fetchBooks();
         } else {
-          await libraryAPI.deleteBook(itemId);
+          await libraryAPI.deleteBorrowRecord(itemId);
           fetchBorrowRecords();
         }
         fetchStats();

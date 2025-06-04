@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { studentsAPI } from '../services/api';
 
 const Students = () => {
@@ -30,9 +30,14 @@ const Students = () => {
     admissionDate: '',
     guardianName: '',
     guardianPhone: '',
-    status: 'active'  });
+    status: 'active'
+  });
 
-  const fetchStudents = useCallback(async () => {
+  useEffect(() => {
+    fetchStudents();
+  }, [currentPage, searchTerm, filters]);
+
+  const fetchStudents = async () => {
     try {
       setLoading(true);
       const params = {
@@ -50,11 +55,9 @@ const Students = () => {
       setError('Failed to fetch students');
       console.error('Error fetching students:', err);
     } finally {
-      setLoading(false);    }  }, [currentPage, searchTerm, filters]);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
