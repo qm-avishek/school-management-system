@@ -2,8 +2,11 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 async function testConnection() {
-    console.log('🔍 Testing MongoDB Atlas connection...');
-    console.log('📍 Connection string:', process.env.MONGODB_URI?.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@'));
+    // Use local MongoDB for CI, Atlas for production
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/ssgb_college_test';
+    
+    console.log('🔍 Testing MongoDB connection...');
+    console.log('📍 Connection string:', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//***:***@'));
     
     try {
         console.log('⏳ Attempting to connect...');
@@ -14,8 +17,8 @@ async function testConnection() {
             connectTimeoutMS: 10000,
         };
         
-        await mongoose.connect(process.env.MONGODB_URI, options);
-        console.log('✅ MongoDB Atlas connection successful!');
+        await mongoose.connect(mongoUri, options);
+        console.log('✅ MongoDB connection successful!');
         console.log('📊 Database name:', mongoose.connection.name);
         console.log('🌐 Host:', mongoose.connection.host);
         
