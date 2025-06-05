@@ -2,8 +2,7 @@
   "name": "ssgb-college-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
-  "dependencies": {
+  "homepage": ".",  "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.2",
@@ -19,7 +18,8 @@
     "date-fns": "^2.30.0",
     "tailwindcss": "^3.3.6",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32"
+    "postcss": "^8.4.32",
+    "serve": "^14.2.1"
   },
   "scripts": {
     "start": "react-scripts start",

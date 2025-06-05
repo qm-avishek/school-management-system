@@ -2,7 +2,7 @@ const express = require('express');
 
 const app = express();
 
-// Simple health check route for Railway deployment
+// Simple health check route for Vercel deployment
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     message: 'Server is healthy',

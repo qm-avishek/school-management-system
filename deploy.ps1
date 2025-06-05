@@ -4,7 +4,7 @@
 param(
     [switch]$Help,
     [switch]$SkipTests,
-    [string]$Platform = "railway" # railway, render, or heroku
+    [string]$Platform = "vercel" # vercel, render, or heroku
 )
 
 # Colors for output
@@ -64,15 +64,15 @@ Usage: .\deploy.ps1 [options]
 Options:
   -Help         Show this help message
   -SkipTests    Skip pre-deployment tests
-  -Platform     Target platform (railway, render, heroku)
+  -Platform     Target platform (vercel, render, heroku)
 
 Examples:
   .\deploy.ps1                    # Interactive setup
-  .\deploy.ps1 -Platform railway  # Deploy to Railway
+  .\deploy.ps1 -Platform vercel  # Deploy to Vercel
   .\deploy.ps1 -SkipTests        # Skip testing phase
 
 Platforms:
-  railway   - Railway.app (Recommended, Free $5/month)
+  vercel    - Vercel (Recommended, Serverless)
   render    - Render.com (Free tier with limitations)
   heroku    - Heroku (Paid plans only)
 
@@ -212,9 +212,8 @@ function Test-Builds {
 function Show-DeploymentInstructions {
     Write-Title "🚀 Deployment Instructions"
     
-    switch ($Platform.ToLower()) {
-        "railway" {
-            Write-ColorOutput "Railway Deployment (Recommended)" "Cyan"
+    switch ($Platform.ToLower()) {        "vercel" {
+            Write-ColorOutput "Vercel Deployment (Recommended)" "Cyan"
             Write-Host @"
 
 📱 Frontend (Vercel):
@@ -224,17 +223,18 @@ function Show-DeploymentInstructions {
 4. Set root directory: frontend
 5. Add environment variable: REACT_APP_API_URL=/api
 
-🖥️ Backend (Railway):
-1. Go to https://railway.app
-2. New Project → Deploy from GitHub
-3. Select this repository/backend folder
-4. Add MongoDB service
-5. Set environment variables:
-   - MONGODB_URI=mongodb://mongo:27017/ssgb_college
+🖥️ Backend (Vercel):
+1. Go to https://vercel.com
+2. New Project → Import from Git
+3. Select this repository
+4. Set root directory: backend
+5. Add environment variables:
+   - MONGODB_URI=your_mongodb_atlas_uri
    - JWT_SECRET=$(New-Guid)
    - NODE_ENV=production
+   - CORS_ORIGIN=https://your-frontend-domain.vercel.app
 
-💰 Cost: Free ($5 monthly credit)
+💰 Cost: Free tier available
 "@
         }
         "render" {

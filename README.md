@@ -284,7 +284,12 @@ school-management-system/
 
 ## 🚀 Deployment
 
-### Quick Deploy (Free Hosting)
+### Quick Deploy (Hybrid Architecture)
+
+**🎯 Our Deployment Stack:**
+- **Frontend**: [Vercel](https://vercel.com) (Static React App)
+- **Backend**: [Railway](https://railway.app) (Node.js API)
+- **Database**: MongoDB Atlas (Cloud Database)
 
 #### Option 1: Automated Setup
 ```bash
@@ -297,11 +302,6 @@ node deploy-setup.js
 
 #### Option 2: Manual Deployment
 
-**🎯 Recommended Free Stack:**
-- **Frontend**: [Vercel](https://vercel.com) (Free unlimited projects)
-- **Backend**: [Railway](https://railway.app) (Free $5/month credit)
-- **Database**: Railway MongoDB (Included)
-
 **📚 Step-by-Step Guide:**
 
 1. **Deploy Backend to Railway**:
@@ -309,14 +309,14 @@ node deploy-setup.js
    # 1. Create Railway account and link GitHub
    # 2. New Project → Deploy from GitHub repo
    # 3. Select backend folder
-   # 4. Add MongoDB service
-   # 5. Set environment variables:
+   # 4. Set environment variables:
    ```
    ```env
-   MONGODB_URI=mongodb://mongo:27017/ssgb_college
+   MONGODB_URI=your_mongodb_atlas_connection_string
    JWT_SECRET=your_production_secret_here
    NODE_ENV=production
    PORT=5000
+   CORS_ORIGIN=https://your-frontend-domain.vercel.app
    ```
 
 2. **Deploy Frontend to Vercel**:
@@ -327,31 +327,44 @@ node deploy-setup.js
    # 4. Add environment variables:
    ```
    ```env
-   REACT_APP_API_URL=/api
+   REACT_APP_API_URL=https://your-backend-domain.railway.app/api
    GENERATE_SOURCEMAP=false
    ```
 
-3. **Configure API Proxy**:
-   - Update `frontend/vercel.json` with your Railway backend URL
-   - Push changes to trigger redeployment
+3. **Configure GitHub Actions**:
+   
+   **🔧 GitHub Secrets Required:**
+   ```
+   # Vercel Secrets
+   VERCEL_TOKEN=your_vercel_token
+   VERCEL_ORG_ID=your_org_id  
+   VERCEL_FRONTEND_PROJECT_ID=your_frontend_project_id
+   
+   # Railway Secrets
+   RAILWAY_TOKEN=your_railway_token
+   RAILWAY_BACKEND_SERVICE_ID=your_backend_service_id
+   ```
 
-4. **GitHub Actions (Automated Deployment)**:
-   - Add secrets in GitHub repository settings
-   - Push to main branch triggers automatic deployment
-   - Monitor deployment in Actions tab
-
-**🔧 GitHub Secrets Required:**
-```
-VERCEL_TOKEN=your_vercel_token
-VERCEL_ORG_ID=your_org_id  
-VERCEL_PROJECT_ID=your_project_id
-RAILWAY_TOKEN=your_railway_token
-RAILWAY_SERVICE_ID=your_service_id
-```
+4. **GitHub Actions Workflows**:
+   - **Frontend**: `.github/workflows/frontend-vercel.yml` (Deploys to Vercel)
+   - **Backend**: `.github/workflows/backend-railway.yml` (Deploys to Railway)
+   - **Main CI/CD**: `.github/workflows/ci-cd.yml` (Overall testing)
 
 **📖 Documentation:**
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Comprehensive deployment guide
-- [DEPLOY_INSTRUCTIONS.md](./DEPLOY_INSTRUCTIONS.md) - Quick start guide (auto-generated)
+- [HYBRID_DEPLOYMENT_SETUP.md](./HYBRID_DEPLOYMENT_SETUP.md) - Complete hybrid setup guide
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Legacy deployment options
+
+### Workflow Triggers
+
+#### Frontend Deployment (Vercel)
+- **Trigger**: Changes to `frontend/**` files
+- **Action**: Automatic build and deploy to Vercel
+- **URL**: Updates automatically on each deployment
+
+#### Backend Deployment (Railway)
+- **Trigger**: Changes to `backend/**` files  
+- **Action**: Automatic build and deploy to Railway
+- **Health Check**: `/health` endpoint validation
 
 ### Alternative Deployment Options
 

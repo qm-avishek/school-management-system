@@ -138,22 +138,16 @@ function checkWorkflows() {
 // Check deployment configuration
 function checkDeploymentConfig() {
     log(`\n${colors.bold}🚀 Deployment Configuration${colors.reset}`);
-    
-    const configs = [
+      const configs = [
         {
             name: 'Vercel (Frontend)',
             path: 'frontend/vercel.json',
             platform: 'vercel'
         },
         {
-            name: 'Railway (Backend)',
-            path: 'backend/railway.json',
-            platform: 'railway'
-        },
-        {
-            name: 'Docker (Backend)',
-            path: 'backend/Dockerfile',
-            platform: 'docker'
+            name: 'Vercel (Backend)',
+            path: 'backend/vercel.json',
+            platform: 'vercel'
         },
         {
             name: 'Health Check',

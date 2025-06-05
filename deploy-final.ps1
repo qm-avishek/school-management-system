@@ -108,7 +108,7 @@ GENERATE_SOURCEMAP=true
 # Show deployment instructions
 Write-Title "🚀 Deployment Instructions"
 
-Write-Host "Railway Deployment (Recommended)" -ForegroundColor Cyan
+Write-Host "Vercel Deployment (Recommended)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📱 Frontend (Vercel):"
 Write-Host "1. Go to https://vercel.com"
@@ -117,8 +117,8 @@ Write-Host "3. Select this repository"
 Write-Host "4. Set root directory: frontend"
 Write-Host "5. Add environment variable: REACT_APP_API_URL=/api"
 Write-Host ""
-Write-Host "🖥️ Backend (Railway):"
-Write-Host "1. Go to https://railway.app"
+Write-Host "🖥️ Backend (Vercel):"
+Write-Host "1. Go to https://vercel.com"
 Write-Host "2. New Project → Deploy from GitHub"
 Write-Host "3. Select this repository/backend folder"
 Write-Host "4. Add MongoDB service"
