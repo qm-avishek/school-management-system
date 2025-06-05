@@ -68,7 +68,6 @@ jobs:
         vercel-token: Wcy6d56q7FEBKup6677RqcwP
         vercel-org-id: team_Z7lnGIIr1PEbM5kkmbLcwFcH
         vercel-project-id: prj_RLZw3QVlINTR6P6nrlUTdEh7y6fL
-        working-directory: frontend
         vercel-args: '--prod'
         
     - name: Deployment Summary
