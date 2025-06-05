@@ -29,7 +29,7 @@ jobs:
       env:
         RAILWAY_TOKEN: 2c291c17-9581-44f9-89a0-0da65976bead
       with:
-        service: 8a40dbd6-f389-4f50-b53e-9689a4977c91
+        service: 64c7d8db-5b5c-4f0b-82e8-32d7e911a874
         detach: false
         
     - name: Wait for Deployment

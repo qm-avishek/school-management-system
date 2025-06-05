@@ -18,7 +18,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-          - name: Deploy Frontend to Vercel
+        
+    - name: Deploy Frontend to Vercel
       uses: amondnet/vercel-action@v25
       with:
         vercel-token: Wcy6d56q7FEBKup6677RqcwP
