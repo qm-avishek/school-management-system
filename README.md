@@ -327,7 +327,7 @@ node deploy-setup.js
    # 4. Add environment variables:
    ```
    ```env
-   REACT_APP_API_URL=https://your-backend-domain.railway.app/api
+   REACT_APP_API_URL=https://sms-service.up.railway.app/api
    GENERATE_SOURCEMAP=false
    ```
 
@@ -419,7 +419,7 @@ npm run build
 ### Monitoring & Maintenance
 
 **Health Checks:**
-- Backend: `https://your-backend.railway.app/api/health`
+- Backend: `https://sms-service.up.railway.app/api/health`
 - Frontend: Monitor in Vercel dashboard
 
 **Logs:**

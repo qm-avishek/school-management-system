@@ -30,7 +30,7 @@ Updated GitHub Actions workflows to fix deployment issues and remove redundancy.
 - **File**: `frontend/.env.production`
 - **Update**: Changed API URL to actual Railway backend:
   ```
-  REACT_APP_API_URL=https://school-management-system-production-a207.up.railway.app/api
+  REACT_APP_API_URL=https://sms-service.up.railway.app/api
   ```
 
 ## Required GitHub Secrets ✅
