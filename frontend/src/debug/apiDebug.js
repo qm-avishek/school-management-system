@@ -9,9 +9,8 @@ console.log('API_URL being used:', API_URL);
 
 // Test API connection
 async function testConnection() {
-  try {
-    console.log('🔍 Testing basic connection to:', `${API_URL}/health`);
-    const response = await axios.get(`${API_URL}/health`);
+  try {    console.log('🔍 Testing basic connection to:', `${API_URL}/api/health`);
+    const response = await axios.get(`${API_URL}/api/health`);
     console.log('✅ Health check response:', response.data);
   } catch (error) {
     console.error('❌ Health check failed:', error.message);

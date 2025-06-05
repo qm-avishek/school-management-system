@@ -364,7 +364,7 @@ node deploy-setup.js
 #### Backend Deployment (Railway)
 - **Trigger**: Changes to `backend/**` files  
 - **Action**: Automatic build and deploy to Railway
-- **Health Check**: `/health` endpoint validation
+- **Health Check**: `/api/health` endpoint validation
 
 ### Alternative Deployment Options
 

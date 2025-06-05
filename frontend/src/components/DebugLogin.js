@@ -42,7 +42,7 @@ const DebugLogin = () => {
       addLog('🔍 Testing health check...');
       
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_URL}/health`);
+      const response = await fetch(`${API_URL}/api/health`);
       const data = await response.json();
       
       addLog('✅ Health check successful!');

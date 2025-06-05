@@ -101,10 +101,9 @@ RAILWAY_BACKEND_SERVICE_ID=your_backend_service_id
 {
   "build": {
     "builder": "NIXPACKS"
-  },
-  "deploy": {
+  },  "deploy": {
     "startCommand": "npm start",
-    "healthcheckPath": "/health",
+    "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
@@ -158,7 +157,7 @@ Both workflows include comprehensive testing:
 
 ### Backend (Railway)
 - Access logs through Railway dashboard
-- Health check monitoring at `/health` endpoint
+- Health check monitoring at `/api/health` endpoint
 - Automatic restart on failure
 
 ### Frontend (Vercel)

@@ -8,9 +8,8 @@ async function debugFrontendConnection() {
   
   // Test 1: Health Check
   console.log('\n📋 Test 1: Health Check');
-  console.log('─'.repeat(40));
-  try {
-    const response = await axios.get(`${API_URL}/health`, {
+  console.log('─'.repeat(40));  try {
+    const response = await axios.get(`${API_URL}/api/health`, {
       timeout: 5000
     });
     console.log('✅ Health check successful!');
