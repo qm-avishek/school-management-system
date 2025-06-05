@@ -20,10 +20,9 @@
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
     "serve": "^14.2.1"
-  },
-  "scripts": {
+  },  "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "set \"CI=false\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

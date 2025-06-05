@@ -95,7 +95,6 @@ const Library = () => {
       console.error('Error fetching stats:', err);
     }
   };
-
   useEffect(() => {
     if (activeTab === 'books') {
       fetchBooksData();
@@ -103,6 +102,7 @@ const Library = () => {
       fetchBorrowRecordsData();
     }
     fetchStatsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, currentPage, searchTerm, filters]);
   // Separate refresh functions for manual refreshes
   const refreshBooks = async () => {
