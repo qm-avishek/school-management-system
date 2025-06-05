@@ -42,7 +42,7 @@ The error occurs when GitHub Pages is not properly enabled in the repository set
 
 **Production Configuration**:
 ```env
-REACT_APP_API_URL=https://school-management-backend.railway.app/api
+REACT_APP_API_URL=https://school-management-system-production-a207.up.railway.app/api
 GENERATE_SOURCEMAP=false
 PUBLIC_URL=.
 BUILD_PATH=build
