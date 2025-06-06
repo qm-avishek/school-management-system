@@ -1,53 +1,76 @@
-# Quick Start Guide - SSGB Engineering College Management System
+# 🚀 Quick Start Guide
 
-## 🚀 5-Minute Setup Guide
+## Prerequisites
+- Node.js 18.x or higher
+- Git
+- MongoDB Atlas account (or local MongoDB)
 
-### Step 1: Install Dependencies
+## 1-Minute Setup
+
+### Option 1: Automated Setup (Windows)
 ```powershell
-# Run in PowerShell from the project root
-./setup.ps1
+# Clone and start the application
+git clone https://github.com/qm-avishek/school-management-system.git
+cd school-management-system
+.\start.ps1
 ```
 
-### Step 2: Configure Database
-1. Make sure MongoDB is running on your system
-2. The default connection is: `mongodb://localhost:27017/ssgb_college`
-3. If you're using MongoDB Atlas, update the connection string in `backend/.env`
-
-### Step 3: Create Initial Admin User
+### Option 2: Manual Setup
 ```powershell
-cd backend
-npm run seed
-```
-
-### Step 4: Start the Application
-```powershell
-# Go back to project root
-cd ..
-./start.ps1
-```
-
-### Step 5: Access the Application
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- Login with: admin@ssgb.edu / admin123
-
-## 🔧 Manual Installation (Alternative)
-
-If the scripts don't work, follow these steps:
-
-### Backend Setup
-```powershell
+# Backend setup
 cd backend
 npm install
-node scripts/seedAdmin.js
-npm run dev
-```
+cp .env.example .env
+# Edit .env with your MongoDB URI and JWT secret
+npm run seed    # Create admin user
+npm run dev     # Start backend (port 5000)
 
-### Frontend Setup (in new terminal)
-```powershell
+# Frontend setup (new terminal)
 cd frontend
 npm install
-npm start
+npm start       # Start frontend (port 3000)
+```
+
+## Default Login
+- **URL**: http://localhost:3000
+- **Email**: admin@ssgb.edu
+- **Password**: admin123
+
+## Environment Configuration
+
+### Backend (.env)
+```env
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/ssgb_college
+JWT_SECRET=your-super-secret-jwt-key
+NODE_ENV=development
+PORT=5000
+CORS_ORIGIN=http://localhost:3000
+```
+
+### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:5000
+```
+
+## Available Features
+- 👨‍🎓 Student Management
+- 👨‍💼 Employee Management  
+- 💰 Finance Tracking
+- � Library Management
+- 📊 Dashboard Analytics
+
+## Next Steps
+1. Change default admin password
+2. Add your first student/employee
+3. Explore the dashboard
+4. Check out the full README.md for deployment
+
+## Need Help?
+- Check the troubleshooting section in README.md
+- Create an issue on GitHub
+- Review the database setup guide
+
+**Ready in under 60 seconds!** 🎉
 ```
 
 ## 🌐 MongoDB Setup Options
