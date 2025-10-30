@@ -13,6 +13,7 @@ const studentRoutes = require('./routes/students');
 const employeeRoutes = require('./routes/employees');
 const financeRoutes = require('./routes/finance');
 const libraryRoutes = require('./routes/library');
+const attendanceRoutes = require('./routes/attendance');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/library', libraryRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

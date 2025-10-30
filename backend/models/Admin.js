@@ -36,7 +36,8 @@ const adminSchema = new mongoose.Schema({
     students: { type: Boolean, default: true },
     employees: { type: Boolean, default: true },
     finance: { type: Boolean, default: true },
-    library: { type: Boolean, default: true }
+    library: { type: Boolean, default: true },
+    attendance: { type: Boolean, default: true }
   },
   lastLogin: {
     type: Date

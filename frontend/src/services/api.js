@@ -112,4 +112,23 @@ export const libraryAPI = {
   getStats: () => api.get('/library/stats/overview'),
 };
 
+// Attendance API
+export const attendanceAPI = {
+  // Mark attendance
+  markAttendance: (data) => api.post('/attendance/mark', data),
+  markBulkAttendance: (data) => api.post('/attendance/mark-bulk', data),
+  
+  // Get attendance records
+  getAttendance: (params) => api.get('/attendance', { params }),
+  getStudentAttendance: (studentId, params) => 
+    api.get(`/attendance/student/${studentId}`, { params }),
+  
+  // Reports and stats
+  getReport: (params) => api.get('/attendance/report', { params }),
+  getStats: (params) => api.get('/attendance/stats', { params }),
+  
+  // Delete attendance
+  deleteAttendance: (id) => api.delete(`/attendance/${id}`),
+};
+
 export default api;
