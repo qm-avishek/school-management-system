@@ -10,6 +10,7 @@ import Students from './pages/Students';
 import Employees from './pages/Employees';
 import Finance from './pages/Finance';
 import Library from './pages/Library';
+import Attendance from './pages/Attendance';
 
 const Settings = () => (
   <div className="px-4 sm:px-6 lg:px-8">
@@ -81,6 +82,7 @@ function App() {
                       <Route path="/employees" element={<Employees />} />
                       <Route path="/finance" element={<Finance />} />
                       <Route path="/library" element={<Library />} />
+                      <Route path="/attendance" element={<Attendance />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>

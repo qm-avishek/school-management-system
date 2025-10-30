@@ -14,6 +14,7 @@ import {
   GraduationCap,
   User,
   Bell,
+  ClipboardCheck,
 } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -40,6 +41,12 @@ const Layout = ({ children }) => {
       href: '/employees',
       icon: Briefcase,
       permission: admin?.permissions?.employees,
+    },
+    {
+      name: 'Attendance',
+      href: '/attendance',
+      icon: ClipboardCheck,
+      permission: admin?.permissions?.attendance,
     },
     {
       name: 'Finance',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { studentsAPI, employeesAPI, financeAPI, libraryAPI } from '../services/api';
+import { studentsAPI, employeesAPI, financeAPI, libraryAPI, attendanceAPI } from '../services/api';
 import {
   Users,
   Briefcase,
@@ -9,6 +9,7 @@ import {
   TrendingDown,
   UserCheck,
   AlertTriangle,
+  ClipboardCheck,
 } from 'lucide-react';
 import {
   BarChart,
@@ -29,6 +30,7 @@ const Dashboard = () => {
     employees: {},
     finance: {},
     library: {},
+    attendance: {},
   });
   const [loading, setLoading] = useState(true);
 
@@ -36,11 +38,22 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const [studentsRes, employeesRes, financeRes, libraryRes] = await Promise.all([
+        
+        // Get date range for last 30 days
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        const format = (date) => date.toISOString().split('T')[0];
+        
+        const [studentsRes, employeesRes, financeRes, libraryRes, attendanceRes] = await Promise.all([
           studentsAPI.getStats(),
           employeesAPI.getStats(),
           financeAPI.getReports(),
           libraryAPI.getStats(),
+          attendanceAPI.getStats({ 
+            startDate: format(startDate), 
+            endDate: format(endDate) 
+          }).catch(() => ({ data: {} })), // Handle error gracefully if attendance feature is not available
         ]);
 
         setStats({
@@ -48,6 +61,7 @@ const Dashboard = () => {
           employees: employeesRes.data,
           finance: financeRes.data,
           library: libraryRes.data,
+          attendance: attendanceRes.data,
         });
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -87,6 +101,15 @@ const Dashboard = () => {
       bgColor: 'bg-green-50',
     },
     {
+      title: 'Attendance Rate',
+      value: `${stats.attendance.attendancePercentage || 0}%`,
+      change: '+2%',
+      changeType: 'increase',
+      icon: ClipboardCheck,
+      color: 'bg-indigo-500',
+      bgColor: 'bg-indigo-50',
+    },
+    {
       title: 'Monthly Revenue',
       value: `₹${(stats.finance.summary?.totalIncome || 0).toLocaleString()}`,
       change: '+8%',
@@ -120,7 +143,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
         {statCards.map((stat, index) => (
           <div key={index} className="card overflow-hidden">
             <div className="p-6">
@@ -285,6 +308,67 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Attendance Overview */}
+        {stats.attendance.totalRecords > 0 && (
+          <div className="card">
+            <div className="card-header">
+              <h3 className="text-lg font-medium text-gray-900">Attendance Overview (Last 30 Days)</h3>
+            </div>
+            <div className="card-body">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <UserCheck className="h-5 w-5 text-green-500 mr-2" />
+                    <span className="text-sm text-gray-600">Present</span>
+                  </div>
+                  <span className="text-lg font-semibold text-green-600">
+                    {stats.attendance.statusStats?.Present || 0}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-red-500 mr-2" />
+                    <span className="text-sm text-gray-600">Absent</span>
+                  </div>
+                  <span className="text-lg font-semibold text-red-600">
+                    {stats.attendance.statusStats?.Absent || 0}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <ClipboardCheck className="h-5 w-5 text-yellow-500 mr-2" />
+                    <span className="text-sm text-gray-600">Late</span>
+                  </div>
+                  <span className="text-lg font-semibold text-yellow-600">
+                    {stats.attendance.statusStats?.Late || 0}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Users className="h-5 w-5 text-blue-500 mr-2" />
+                    <span className="text-sm text-gray-600">Excused</span>
+                  </div>
+                  <span className="text-lg font-semibold text-blue-600">
+                    {stats.attendance.statusStats?.Excused || 0}
+                  </span>
+                </div>
+
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Overall Attendance</span>
+                    <span className="text-2xl font-bold text-indigo-600">
+                      {stats.attendance.attendancePercentage || 0}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Recent Activities */}
@@ -294,7 +378,7 @@ const Dashboard = () => {
             <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
           </div>
           <div className="card-body">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                 <Users className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="text-sm font-medium text-gray-900">Add Student</div>
@@ -303,6 +387,11 @@ const Dashboard = () => {
               <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                 <Briefcase className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <div className="text-sm font-medium text-gray-900">Add Employee</div>
+              </button>
+
+              <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <ClipboardCheck className="h-8 w-8 text-indigo-500 mx-auto mb-2" />
+                <div className="text-sm font-medium text-gray-900">Mark Attendance</div>
               </button>
               
               <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">

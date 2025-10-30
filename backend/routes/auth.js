@@ -32,7 +32,8 @@ router.post('/register', async (req, res) => {
         students: true,
         employees: true,
         finance: true,
-        library: true
+        library: true,
+        attendance: true
       }
     });
 
