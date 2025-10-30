@@ -80,14 +80,14 @@ const Attendance = () => {
     }
   }, [selectedCourse, selectedYear, selectedSemester]);
 
-  // Fetch students for marking attendance
+  // Trigger student fetch when relevant data changes
   useEffect(() => {
     if (activeTab === 'mark' && selectedCourse && selectedYear && selectedSemester) {
       fetchStudentsForAttendance();
     }
   }, [activeTab, fetchStudentsForAttendance, selectedCourse, selectedYear, selectedSemester, selectedDate]);
 
-  // Fetch attendance stats
+  // Trigger attendance stats fetch when reports tab is active
   useEffect(() => {
     if (activeTab === 'reports') {
       fetchAttendanceStats();

@@ -1,9 +1,27 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Attendance = require('../models/Attendance');
 const Student = require('../models/Student');
 const { auth, checkPermission } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Helper function to sanitize query parameters
+const sanitizeQuery = (query) => {
+  const sanitized = {};
+  for (const [key, value] of Object.entries(query)) {
+    // Only allow simple types, no objects or arrays that could contain operators
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+};
+
+// Helper to validate ObjectId
+const isValidObjectId = (id) => {
+  return mongoose.Types.ObjectId.isValid(id);
+};
 
 // Apply auth middleware to all routes
 router.use(auth);
@@ -17,6 +35,17 @@ router.post('/mark', async (req, res) => {
     // Validate required fields
     if (!studentId || !date || !status) {
       return res.status(400).json({ message: 'Student ID, date, and status are required' });
+    }
+
+    // Validate ObjectId format
+    if (!isValidObjectId(studentId)) {
+      return res.status(400).json({ message: 'Invalid student ID format' });
+    }
+
+    // Validate status enum
+    const validStatuses = ['Present', 'Absent', 'Late', 'Excused'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
     }
 
     // Get student details
@@ -104,22 +133,35 @@ router.post('/mark-bulk', async (req, res) => {
       try {
         const { studentId, status, subject, remarks } = record;
 
+        // Validate student ID
+        if (!isValidObjectId(studentId)) {
+          results.failed.push({ studentId, error: 'Invalid student ID format' });
+          continue;
+        }
+
+        // Validate status
+        const validStatuses = ['Present', 'Absent', 'Late', 'Excused'];
+        if (!validStatuses.includes(status)) {
+          results.failed.push({ studentId, error: 'Invalid status value' });
+          continue;
+        }
+
         const student = await Student.findById(studentId);
         if (!student) {
           results.failed.push({ studentId, error: 'Student not found' });
           continue;
         }
 
-        const attendanceDate = new Date(date).setHours(0, 0, 0, 0);
+        const attendanceDate = new Date(String(date)).setHours(0, 0, 0, 0);
 
         // Check if attendance exists
         let attendance = await Attendance.findOne({ studentId, date: attendanceDate });
 
         if (attendance) {
           // Update existing
-          attendance.status = status;
-          attendance.subject = subject;
-          attendance.remarks = remarks;
+          attendance.status = String(status);
+          attendance.subject = subject ? String(subject) : attendance.subject;
+          attendance.remarks = remarks ? String(remarks) : attendance.remarks;
           attendance.markedBy = req.admin._id;
           await attendance.save();
         } else {
@@ -127,12 +169,12 @@ router.post('/mark-bulk', async (req, res) => {
           attendance = new Attendance({
             studentId,
             date: attendanceDate,
-            status,
+            status: String(status),
             course: student.course,
             year: student.year,
             semester: student.semester,
-            subject,
-            remarks,
+            subject: subject ? String(subject) : undefined,
+            remarks: remarks ? String(remarks) : undefined,
             markedBy: req.admin._id,
             academicYear
           });
@@ -175,28 +217,29 @@ router.get('/', async (req, res) => {
 
     const query = {};
 
+    // Validate and sanitize query parameters
     if (startDate && endDate) {
       query.date = {
-        $gte: new Date(startDate).setHours(0, 0, 0, 0),
-        $lte: new Date(endDate).setHours(23, 59, 59, 999)
+        $gte: new Date(String(startDate)).setHours(0, 0, 0, 0),
+        $lte: new Date(String(endDate)).setHours(23, 59, 59, 999)
       };
     } else if (startDate) {
-      query.date = { $gte: new Date(startDate).setHours(0, 0, 0, 0) };
+      query.date = { $gte: new Date(String(startDate)).setHours(0, 0, 0, 0) };
     } else if (endDate) {
-      query.date = { $lte: new Date(endDate).setHours(23, 59, 59, 999) };
+      query.date = { $lte: new Date(String(endDate)).setHours(23, 59, 59, 999) };
     }
 
-    if (course) query.course = course;
-    if (year) query.year = parseInt(year);
-    if (semester) query.semester = parseInt(semester);
-    if (status) query.status = status;
-    if (studentId) query.studentId = studentId;
+    if (course) query.course = String(course);
+    if (year && !isNaN(year)) query.year = parseInt(year);
+    if (semester && !isNaN(semester)) query.semester = parseInt(semester);
+    if (status) query.status = String(status);
+    if (studentId && isValidObjectId(studentId)) query.studentId = studentId;
 
     const attendance = await Attendance.find(query)
       .populate('studentId', 'firstName lastName studentId email')
       .sort({ date: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+      .limit(parseInt(limit) * 1)
+      .skip((parseInt(page) - 1) * parseInt(limit));
 
     const total = await Attendance.countDocuments(query);
 
@@ -221,12 +264,17 @@ router.get('/student/:studentId', async (req, res) => {
     const { studentId } = req.params;
     const { startDate, endDate } = req.query;
 
+    // Validate ObjectId
+    if (!isValidObjectId(studentId)) {
+      return res.status(400).json({ message: 'Invalid student ID format' });
+    }
+
     const query = { studentId };
 
     if (startDate && endDate) {
       query.date = {
-        $gte: new Date(startDate).setHours(0, 0, 0, 0),
-        $lte: new Date(endDate).setHours(23, 59, 59, 999)
+        $gte: new Date(String(startDate)).setHours(0, 0, 0, 0),
+        $lte: new Date(String(endDate)).setHours(23, 59, 59, 999)
       };
     }
 
@@ -270,14 +318,14 @@ router.get('/stats', async (req, res) => {
 
     if (startDate && endDate) {
       query.date = {
-        $gte: new Date(startDate).setHours(0, 0, 0, 0),
-        $lte: new Date(endDate).setHours(23, 59, 59, 999)
+        $gte: new Date(String(startDate)).setHours(0, 0, 0, 0),
+        $lte: new Date(String(endDate)).setHours(23, 59, 59, 999)
       };
     }
 
-    if (course) query.course = course;
-    if (year) query.year = parseInt(year);
-    if (semester) query.semester = parseInt(semester);
+    if (course) query.course = String(course);
+    if (year && !isNaN(year)) query.year = parseInt(year);
+    if (semester && !isNaN(semester)) query.semester = parseInt(semester);
 
     const totalRecords = await Attendance.countDocuments(query);
     
@@ -343,22 +391,33 @@ router.get('/report', async (req, res) => {
       });
     }
 
+    // Validate and sanitize inputs
+    const sanitizedCourse = String(course);
+    const sanitizedYear = parseInt(year);
+    const sanitizedSemester = parseInt(semester);
+
+    if (isNaN(sanitizedYear) || isNaN(sanitizedSemester)) {
+      return res.status(400).json({ 
+        message: 'Year and semester must be valid numbers' 
+      });
+    }
+
     // Get all students in the class
     const students = await Student.find({
-      course,
-      year: parseInt(year),
-      semester: parseInt(semester),
+      course: sanitizedCourse,
+      year: sanitizedYear,
+      semester: sanitizedSemester,
       status: 'Active'
     }).select('studentId firstName lastName email');
 
-    const reportDate = new Date(date).setHours(0, 0, 0, 0);
+    const reportDate = new Date(String(date)).setHours(0, 0, 0, 0);
 
     // Get attendance records for the date
     const attendanceRecords = await Attendance.find({
       date: reportDate,
-      course,
-      year: parseInt(year),
-      semester: parseInt(semester)
+      course: sanitizedCourse,
+      year: sanitizedYear,
+      semester: sanitizedSemester
     });
 
     // Create a map for quick lookup
