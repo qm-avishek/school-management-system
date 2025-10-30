@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { attendanceAPI, studentsAPI } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { attendanceAPI } from '../services/api';
 import { 
-  Calendar, 
-  Users, 
   CheckCircle, 
   XCircle, 
   Clock, 
   Filter,
-  Download,
   TrendingUp,
   PieChart
 } from 'lucide-react';
@@ -21,7 +18,6 @@ const Attendance = () => {
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedSemester, setSelectedSemester] = useState('');
   const [students, setStudents] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -39,20 +35,7 @@ const Attendance = () => {
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 
   // Fetch students for marking attendance
-  useEffect(() => {
-    if (activeTab === 'mark' && selectedCourse && selectedYear && selectedSemester) {
-      fetchStudentsForAttendance();
-    }
-  }, [activeTab, selectedCourse, selectedYear, selectedSemester, selectedDate]);
-
-  // Fetch attendance stats
-  useEffect(() => {
-    if (activeTab === 'reports') {
-      fetchAttendanceStats();
-    }
-  }, [activeTab, selectedCourse, selectedYear, selectedSemester]);
-
-  const fetchStudentsForAttendance = async () => {
+  const fetchStudentsForAttendance = useCallback(async () => {
     try {
       setLoading(true);
       const response = await attendanceAPI.getReport({
@@ -69,9 +52,9 @@ const Attendance = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, selectedCourse, selectedYear, selectedSemester]);
 
-  const fetchAttendanceStats = async () => {
+  const fetchAttendanceStats = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -95,7 +78,21 @@ const Attendance = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCourse, selectedYear, selectedSemester]);
+
+  // Fetch students for marking attendance
+  useEffect(() => {
+    if (activeTab === 'mark' && selectedCourse && selectedYear && selectedSemester) {
+      fetchStudentsForAttendance();
+    }
+  }, [activeTab, fetchStudentsForAttendance, selectedCourse, selectedYear, selectedSemester, selectedDate]);
+
+  // Fetch attendance stats
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      fetchAttendanceStats();
+    }
+  }, [activeTab, fetchAttendanceStats]);
 
   const handleAttendanceChange = (studentId, status) => {
     setStudents(prevStudents =>

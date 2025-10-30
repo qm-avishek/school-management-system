@@ -83,27 +83,24 @@ npm start     # Start frontend on port 3000
 - Search and filter books by various criteria
 - Book reservation system
 
+### 📋 Attendance Management
+- Daily attendance marking for students
+- Bulk attendance operations (mark all present/absent)
+- Course, year, and semester-wise attendance tracking
+- Multiple status options (Present, Absent, Late, Excused)
+- Attendance reports and statistics
+- Real-time attendance percentage calculation
+- Last 30 days attendance analytics
+- Integration with student records
+
 ### 📊 Dashboard & Analytics
 - Real-time statistics and metrics
 - Visual charts and graphs using Recharts
+- Attendance overview with status breakdown
 - Export data to CSV/PDF formats
 - Responsive design for all devices
-- Dark/Light theme support
+- Quick action buttons for common tasks
 - Multiple payment method support
-
-### Library Management
-- Book catalog management
-- Book borrowing and return system
-- Student borrowing history
-- Book availability tracking
-- Search and filter books
-
-### Dashboard & Analytics
-- Real-time statistics
-- Interactive charts and graphs
-- Quick action buttons
-- System overview
-- Performance metrics
 
 ## 🛠️ Technology Stack
 
@@ -240,6 +237,15 @@ GitHub Actions workflow automatically:
 - `POST /api/library/books` - Add new book
 - `POST /api/library/issue` - Issue book to student
 - `POST /api/library/return` - Return book
+
+### Attendance Endpoints
+- `POST /api/attendance/mark` - Mark attendance for a single student
+- `POST /api/attendance/mark-bulk` - Mark attendance for multiple students
+- `GET /api/attendance` - Get attendance records with filters
+- `GET /api/attendance/student/:studentId` - Get attendance for a specific student
+- `GET /api/attendance/stats` - Get attendance statistics
+- `GET /api/attendance/report` - Get attendance report for a class
+- `DELETE /api/attendance/:id` - Delete attendance record
 
 ## 🧪 Testing
 
